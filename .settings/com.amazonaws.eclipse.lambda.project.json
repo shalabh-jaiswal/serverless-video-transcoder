@@ -1,0 +1,1 @@
+{"lastDeploymentHandler":"us.shalabh.svt.lambda.TranscodeSubmitHandler","lastInvokeHandler":null,"handlerMetadata":{"us.shalabh.svt.lambda.TranscodeSubmitHandler":{"deployment":{"regionId":"us-east-1","awsLambdaFunctionName":"transcodeVideo","awsIamRoleName":"lambda-s3-etc-role","awsS3BucketName":"serverless-video-upload-sjus","memory":0,"timeout":0},"invoke":null}}}
