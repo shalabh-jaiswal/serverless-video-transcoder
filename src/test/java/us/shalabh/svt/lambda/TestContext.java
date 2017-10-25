@@ -105,36 +105,25 @@ public class TestContext implements Context {
         remainingTimeInMillis = value;
     }
 
+    
+    public String getFunctionVersion() {
+        return functionVersion;
+    }
+
+    public void setFunctionVersion(String value) {
+        functionVersion = value;
+    }
+
+    
+    public String getInvokedFunctionArn() {
+        return invokedFunctionArn;
+    }
 
     public void setInvokedFunctionArn(String value) {
         invokedFunctionArn = value;
-    }    
-    
+    }
+
     /**
-	 * @return the functionVersion
-	 */
-	public String getFunctionVersion()
-	{
-		return functionVersion;
-	}
-
-	/**
-	 * @param functionVersion the functionVersion to set
-	 */
-	public void setFunctionVersion(String functionVersion)
-	{
-		this.functionVersion = functionVersion;
-	}
-
-	/**
-	 * @return the invokedFunctionArn
-	 */
-	public String getInvokedFunctionArn()
-	{
-		return invokedFunctionArn;
-	}
-
-	/**
      * A simple {@code LambdaLogger} that prints everything to stderr.
      */
     private static class TestLogger implements LambdaLogger {
