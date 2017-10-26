@@ -15,6 +15,11 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 
+/**
+ * AWS Lambda function to submit a Video Transcode job. 
+ *
+ * @author Shalabh Jaiswal
+ */
 public class TranscodeSubmitHandler implements RequestHandler<S3Event, String>
 {
 	private AmazonS3 s3 = AmazonS3ClientBuilder.standard().build();
