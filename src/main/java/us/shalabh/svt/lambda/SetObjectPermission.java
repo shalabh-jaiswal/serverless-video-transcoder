@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class SetObjectPermission implements RequestHandler<SNSEvent, String>
 {
+	// s3 object
+	private AmazonS3 s3 = AmazonS3ClientBuilder.standard().build();
 
 	@Override
 	public String handleRequest(SNSEvent event, Context context)
@@ -25,23 +27,20 @@ public class SetObjectPermission implements RequestHandler<SNSEvent, String>
 		
 		try
 		{
+			// jackson json mapper
 			ObjectMapper mapper = new ObjectMapper();
-			JsonNode actualObj;			
-			actualObj = mapper.readTree(message);
+			JsonNode snsEventJson = mapper.readTree(message);
 
-			JsonNode jsonS3Key = actualObj.get("Records").get(0).get("s3").get("object").get("key");
-
-			// decoded key
-			String key = jsonS3Key.textValue();
-			String objectKey = key.replaceAll("\\+", " ");			
-
-			JsonNode bucketNode = actualObj.get("Records").get(0).get("s3").get("bucket").get("name");			
-			String bucket = bucketNode.textValue();
-						
+			// decoded object key from sns notification
+			JsonNode jsonS3Key = snsEventJson.get("Records").get(0).get("s3").get("object").get("key");
+			String objectKey = jsonS3Key.textValue().replaceAll("\\+", " ");
+			
+			// bucket name from sns notification
+			String bucket = snsEventJson.get("Records").get(0).get("s3").get("bucket").get("name").textValue();			
+			 						
 			context.getLogger().log("Bucket/Key: " + bucket +"/" +objectKey);			
 			
-			// create an S3 object and set its acl			
-			AmazonS3 s3 = AmazonS3ClientBuilder.standard().build();
+			// set the s3 objects ACL.
 			s3.setObjectAcl(bucket, objectKey, CannedAccessControlList.PublicRead);
 		}
 		catch (Exception e)

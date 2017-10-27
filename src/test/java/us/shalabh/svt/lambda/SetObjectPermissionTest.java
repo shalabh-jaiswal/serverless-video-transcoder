@@ -43,18 +43,19 @@ public class SetObjectPermissionTest
 	@Test
 	public void testSetObjectPermission()
 	{
-		//SetObjectPermission handler = new SetObjectPermission();
-		//Context ctx = createContext();
+		// SetObjectPermission handler = new SetObjectPermission();
+		// Context ctx = createContext();
 
-		//String output = handler.handleRequest(input, ctx);
+		// String output = handler.handleRequest(input, ctx);
 
 		// TODO: validate output here if needed.
-		//Assert.assertEquals("Hello from SNS!", output);
+		// Assert.assertEquals("Hello from SNS!", output);
 
-		try
+		try (InputStream is = new FileInputStream(
+				"D:\\workspaces\\neon\\serverless-video-transcoder\\src\\test\\resources\\sns-s3-event.json");
+				BufferedReader buf = new BufferedReader(new InputStreamReader(is));)
 		{
-			InputStream is = new FileInputStream("D:\\workspaces\\neon\\serverless-video-transcoder\\src\\test\\resources\\sns-s3-event.json");
-			BufferedReader buf = new BufferedReader(new InputStreamReader(is));
+
 			String line = buf.readLine();
 			StringBuilder sb = new StringBuilder();
 			while (line != null)
@@ -64,17 +65,17 @@ public class SetObjectPermissionTest
 			}
 			String fileAsString = sb.toString();
 			System.out.println("Contents : " + fileAsString);
-			
+
 			ObjectMapper mapper = new ObjectMapper();
-		    JsonNode actualObj = mapper.readTree(fileAsString);
-		    System.out.println(actualObj.toString());
-		    
-		    // When
-		    JsonNode jsonNode1 = actualObj.get("Records").get(0).get("s3").get("object").get("key");
-		    System.out.println(jsonNode1.textValue());
-		    
-		    JsonNode bucketNode = actualObj.get("Records").get(0).get("s3").get("bucket").get("name");
-		    System.out.println(bucketNode.textValue());
+			JsonNode actualObj = mapper.readTree(fileAsString);
+			System.out.println(actualObj.toString());
+
+			// When
+			JsonNode jsonNode1 = actualObj.get("Records").get(0).get("s3").get("object").get("key");
+			System.out.println(jsonNode1.textValue());
+
+			JsonNode bucketNode = actualObj.get("Records").get(0).get("s3").get("bucket").get("name");
+			System.out.println(bucketNode.textValue());
 		}
 		catch (Exception e)
 		{

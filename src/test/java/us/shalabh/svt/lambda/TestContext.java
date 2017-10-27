@@ -104,7 +104,6 @@ public class TestContext implements Context {
     public void setRemainingTimeInMillis(int value) {
         remainingTimeInMillis = value;
     }
-
     
     public String getFunctionVersion() {
         return functionVersion;
@@ -114,7 +113,6 @@ public class TestContext implements Context {
         functionVersion = value;
     }
 
-    
     public String getInvokedFunctionArn() {
         return invokedFunctionArn;
     }
