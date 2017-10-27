@@ -5,6 +5,12 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 
 import com.amazonaws.services.lambda.runtime.events.SNSEvent;
 
+/**
+ * Obtains meta-data of the video and places them in the transcoded s3 bucket
+ * 
+ * @author sj
+ *
+ */
 public class CreateObjectMetadata implements RequestHandler<SNSEvent, String> {
 
     @Override
