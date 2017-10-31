@@ -170,5 +170,64 @@ public class ServerlessInput {
         public void setApiId(String apiId) {
             this.apiId = apiId;
         }
+		/* (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString()
+		{
+			StringBuilder builder = new StringBuilder();
+			builder.append("RequestContext [accountId=");
+			builder.append(accountId);
+			builder.append(", resourceId=");
+			builder.append(resourceId);
+			builder.append(", stage=");
+			builder.append(stage);
+			builder.append(", requestId=");
+			builder.append(requestId);
+			builder.append(", identity=");
+			builder.append(identity);
+			builder.append(", resourcePath=");
+			builder.append(resourcePath);
+			builder.append(", httpMethod=");
+			builder.append(httpMethod);
+			builder.append(", apiId=");
+			builder.append(apiId);
+			builder.append("]");
+			return builder.toString();
+		}
+                
     }
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		builder.append("ServerlessInput [resource=");
+		builder.append(resource);
+		builder.append(", path=");
+		builder.append(path);
+		builder.append(", httpMethod=");
+		builder.append(httpMethod);
+		builder.append(", headers=");
+		builder.append(headers);
+		builder.append(", queryStringParameters=");
+		builder.append(queryStringParameters);
+		builder.append(", pathParameters=");
+		builder.append(pathParameters);
+		builder.append(", stageVariables=");
+		builder.append(stageVariables);
+		builder.append(", body=");
+		builder.append(body);
+		builder.append(", requestContext=");
+		builder.append(requestContext);
+		builder.append(", isBase64Encoded=");
+		builder.append(isBase64Encoded);
+		builder.append("]");
+		return builder.toString();
+	}
+    
 }
