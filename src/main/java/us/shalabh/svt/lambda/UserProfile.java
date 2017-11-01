@@ -1,30 +1,171 @@
 package us.shalabh.svt.lambda;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.stream.Collectors;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 
 import us.shalabh.svt.lambda.model.ServerlessInput;
 import us.shalabh.svt.lambda.model.ServerlessOutput;
+import us.shalabh.svt.utils.http.HttpUtils;
 
-public class UserProfile implements RequestHandler<ServerlessInput, ServerlessOutput> {
+/**
+ * Validates JWT Token and Obtains User Info from Auth0
+ * 
+ * TODO clean up exception handling. exceptions are being swallowed, that is bad
+ *
+ * @author Shalabh Jaiswal
+ */
+public class UserProfile implements RequestHandler<ServerlessInput, ServerlessOutput>
+{
+	// Context made global to the class
+	private Context context = null;
 
-    @Override
-    public ServerlessOutput handleRequest(ServerlessInput input, Context context) {
-        context.getLogger().log("Input: " + input);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.amazonaws.services.lambda.runtime.RequestHandler#handleRequest(java.
+	 * lang.Object, com.amazonaws.services.lambda.runtime.Context)
+	 */
+	@Override
+	public ServerlessOutput handleRequest(ServerlessInput input, Context context)
+	{
+		this.context = context;
 
-        // TODO: implement your handler
-        ServerlessOutput output = new ServerlessOutput();
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Access-Control-Allow-Origin", "*");
-        output.setHeaders(headers);
-        output.setBody("{\"message\":\"Hello from Lamby\"}");
-        
-        context.getLogger().log("Output: " +output);
-        
-        return output;
-    }
+		context.getLogger().log("Input: " + input);
 
+		String authToken = HttpUtils.getAuthorizationToken(input);
+		context.getLogger().log("Token: " + authToken);
+
+		boolean isValidToken = isValidToken(authToken);
+		context.getLogger().log("Token Valid? " + isValidToken);
+
+		ServerlessOutput output = new ServerlessOutput();
+
+		if (!isValidToken)
+		{
+			// Access is denied
+			HttpUtils.setAccessDeniedResponse(output);
+			return output;
+		}
+
+		// Access allowed
+		HttpUtils.setCORSHeaders(output);		
+		output.setBody(getUserInfo(authToken));
+
+		context.getLogger().log("Output: " + output);
+
+		return output;
+	}
+
+	/**
+	 * Validates the JWT token
+	 * 
+	 * @param authToken
+	 * @return
+	 */
+	private boolean isValidToken(String authToken)
+	{
+		try
+		{
+			// auth0 secret set as env variable in the lambda settings.
+			String secret = System.getenv().get(HttpUtils.AUTH0_SECRET);
+
+			Algorithm algorithm = Algorithm.HMAC256(secret);
+
+			// Reusable verifier instance
+			JWTVerifier verifier = JWT.require(algorithm).build();
+			DecodedJWT jwt = verifier.verify(authToken);
+
+			context.getLogger().log("Token Payload: " + jwt.getPayload());
+
+		}
+		catch (UnsupportedEncodingException exception)
+		{
+			// UTF-8 encoding not supported
+			context.getLogger().log("UTF-8 encoding not supported");
+			exception.printStackTrace();
+
+			return false;
+		}
+		catch (JWTVerificationException exception)
+		{
+			// Invalid signature/claims
+			context.getLogger().log("Invalid Signature/Claims");
+			exception.printStackTrace();
+
+			return false;
+		}
+		catch (Exception e)
+		{
+			// other exception
+			context.getLogger().log("Invalid Token");
+			e.printStackTrace();
+
+			return false;
+		}
+
+		// no exception; token must be good.
+		return true;
+	}
+
+	/**
+	 * Gets the user info from the authToken by reaching out to Auth0
+	 * 
+	 * @param authToken
+	 */
+	private String getUserInfo(String authToken)
+	{
+		// auth0 domain
+		String domain = System.getenv().get(HttpUtils.AUTH0_DOMAIN);
+
+		BufferedReader in = null;
+		
+		try
+		{
+			// Java URL connection
+			String auth0Url = "https://" +domain +"/tokeninfo?id_token=" +authToken;
+			context.getLogger().log(auth0Url);
+			
+			URL url = new URL(auth0Url);
+
+			URLConnection conn = url.openConnection();
+			in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			
+			String response = in.lines().collect(Collectors.joining());
+			return response;
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			context.getLogger().log("Error calling tokeninfo");
+		}
+		finally
+		{
+			try
+			{
+				in.close();
+			}
+			catch (IOException e)
+			{
+				// error closing reader
+				e.printStackTrace();
+				context.getLogger().log("Error closing BufferedReader");
+			}
+		}
+		// no user info extracted
+		return "Error";
+	}
 }
