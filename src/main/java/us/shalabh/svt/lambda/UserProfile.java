@@ -43,18 +43,16 @@ public class UserProfile implements RequestHandler<ServerlessInput, ServerlessOu
 	public ServerlessOutput handleRequest(ServerlessInput input, Context context)
 	{
 		this.context = context;
-
-		context.getLogger().log("Input: " + input);
-
+		
 		String authToken = HttpUtils.getAuthorizationToken(input);
-		context.getLogger().log("Token: " + authToken);
 
-		boolean isValidToken = isValidToken(authToken);
-		context.getLogger().log("Token Valid? " + isValidToken);
+		// validate token
+		boolean isTokenValid = isTokenValid(authToken);
+		context.getLogger().log("Token Valid? " + isTokenValid);
 
 		ServerlessOutput output = new ServerlessOutput();
 
-		if (!isValidToken)
+		if (!isTokenValid)
 		{
 			// Access is denied
 			HttpUtils.setAccessDeniedResponse(output);
@@ -65,8 +63,6 @@ public class UserProfile implements RequestHandler<ServerlessInput, ServerlessOu
 		HttpUtils.setCORSHeaders(output);		
 		output.setBody(getUserInfo(authToken));
 
-		context.getLogger().log("Output: " + output);
-
 		return output;
 	}
 
@@ -76,7 +72,7 @@ public class UserProfile implements RequestHandler<ServerlessInput, ServerlessOu
 	 * @param authToken
 	 * @return
 	 */
-	private boolean isValidToken(String authToken)
+	private boolean isTokenValid(String authToken)
 	{
 		try
 		{
@@ -87,10 +83,7 @@ public class UserProfile implements RequestHandler<ServerlessInput, ServerlessOu
 
 			// Reusable verifier instance
 			JWTVerifier verifier = JWT.require(algorithm).build();
-			DecodedJWT jwt = verifier.verify(authToken);
-
-			context.getLogger().log("Token Payload: " + jwt.getPayload());
-
+			verifier.verify(authToken);
 		}
 		catch (UnsupportedEncodingException exception)
 		{
@@ -135,10 +128,10 @@ public class UserProfile implements RequestHandler<ServerlessInput, ServerlessOu
 		
 		try
 		{
-			// Java URL connection
+			// Auth0 url to get User Info
 			String auth0Url = "https://" +domain +"/tokeninfo?id_token=" +authToken;
-			context.getLogger().log(auth0Url);
 			
+			// Java URL connection
 			URL url = new URL(auth0Url);
 
 			URLConnection conn = url.openConnection();
