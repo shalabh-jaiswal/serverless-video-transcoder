@@ -1,7 +1,6 @@
 package us.shalabh.svt.lambda;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -14,7 +13,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 
 import us.shalabh.svt.lambda.model.ServerlessInput;
 import us.shalabh.svt.lambda.model.ServerlessOutput;
@@ -43,7 +41,7 @@ public class UserProfile implements RequestHandler<ServerlessInput, ServerlessOu
 	public ServerlessOutput handleRequest(ServerlessInput input, Context context)
 	{
 		this.context = context;
-		
+
 		String authToken = HttpUtils.getAuthorizationToken(input);
 
 		// validate token
@@ -60,7 +58,7 @@ public class UserProfile implements RequestHandler<ServerlessInput, ServerlessOu
 		}
 
 		// Access allowed
-		HttpUtils.setCORSHeaders(output);		
+		HttpUtils.setCORSHeaders(output);
 		output.setBody(getUserInfo(authToken));
 
 		return output;
@@ -124,40 +122,27 @@ public class UserProfile implements RequestHandler<ServerlessInput, ServerlessOu
 		// auth0 domain
 		String domain = System.getenv().get(HttpUtils.AUTH0_DOMAIN);
 
-		BufferedReader in = null;
-		
 		try
 		{
 			// Auth0 url to get User Info
-			String auth0Url = "https://" +domain +"/tokeninfo?id_token=" +authToken;
-			
+			String auth0Url = "https://" + domain + "/tokeninfo?id_token=" + authToken;
+
 			// Java URL connection
 			URL url = new URL(auth0Url);
-
 			URLConnection conn = url.openConnection();
-			in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			
-			String response = in.lines().collect(Collectors.joining());
-			return response;
+			try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream())))
+			{
+				String response = in.lines().collect(Collectors.joining());
+				return response;
+			}
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
 			context.getLogger().log("Error calling tokeninfo");
+			e.printStackTrace();			
 		}
-		finally
-		{
-			try
-			{
-				in.close();
-			}
-			catch (IOException e)
-			{
-				// error closing reader
-				e.printStackTrace();
-				context.getLogger().log("Error closing BufferedReader");
-			}
-		}
+
 		// no user info extracted
 		return "Error";
 	}

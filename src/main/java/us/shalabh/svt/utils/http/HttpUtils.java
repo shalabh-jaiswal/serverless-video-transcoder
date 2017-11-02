@@ -52,14 +52,23 @@ public class HttpUtils
 	 */
 	public static String getAuthorizationToken(ServerlessInput input)
 	{
-		String rawToken = input.getHeaders().get(HEADER_AUTHORIZATION);
-		
-		// there is at least something.
+		return extractAuthorizationToken(input.getHeaders().get(HEADER_AUTHORIZATION));
+	}
+	
+	/**
+	 * Extracts the auth token from the row token.
+	 * raw token in our applications is prefixed with: 'Bearer '
+	 * 
+	 * @param rawToken
+	 * @return
+	 */
+	public static String extractAuthorizationToken(String rawToken)
+	{
 		if (rawToken != null && rawToken.length() > 0)
 		{
 			return rawToken.substring(rawToken.lastIndexOf(TOKEN_PREFIX) + TOKEN_PREFIX.length());
 		}
-
+		
 		return null;
 	}
 	
@@ -75,4 +84,6 @@ public class HttpUtils
 		
 		output.setBody("Access Denied");
 	}
+	
+	
 }
