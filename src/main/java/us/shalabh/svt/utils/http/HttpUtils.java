@@ -14,15 +14,11 @@ import us.shalabh.svt.lambda.model.ServerlessOutput;
 public class HttpUtils
 {
 	// auth token header name
-	public static final String HEADER_AUTHORIZATION = "Authorization";
+	private static final String HEADER_AUTHORIZATION = "Authorization";
 	// access denied
-	public static final int HTTP_ACCESS_DENIED = 401;
+	private static final int HTTP_ACCESS_DENIED = 401;
 	// token prefix
-	public static final String TOKEN_PREFIX = "Bearer ";
-	// auth0 env variable keys
-	public static final String AUTH0_DOMAIN = "AUTH0_DOMAIN";
-	public static final String AUTH0_SECRET = "AUTH0_SECRET";
-	public static final String AUTH0_CLIENT_ID = "AUTH0_CLIENT_ID";	
+	private static final String TOKEN_PREFIX = "Bearer ";
 	
 	/**
 	 * Sets CORS headers

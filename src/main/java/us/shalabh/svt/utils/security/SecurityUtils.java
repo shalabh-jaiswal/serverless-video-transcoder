@@ -5,8 +5,6 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
-import us.shalabh.svt.utils.http.HttpUtils;
-
 /**
  * Security Utils
  *
@@ -14,6 +12,10 @@ import us.shalabh.svt.utils.http.HttpUtils;
  */
 public class SecurityUtils
 {
+	// auth0 env variable keys
+	public static final String AUTH0_DOMAIN = "AUTH0_DOMAIN";
+	public static final String AUTH0_CLIENT_ID = "AUTH0_CLIENT_ID";
+	public static final String AUTH0_SECRET = "AUTH0_SECRET";
 
 	/**
 	 * Decodes a JWT token
@@ -24,7 +26,7 @@ public class SecurityUtils
 	public static DecodedJWT decodeJWTToken(String authToken) throws Exception
 	{
 		// auth0 secret set as env variable in the lambda settings.
-		String secret = System.getenv().get(HttpUtils.AUTH0_SECRET);
+		String secret = System.getenv().get(AUTH0_SECRET);
 
 		Algorithm algorithm = Algorithm.HMAC256(secret);
 

@@ -17,6 +17,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import us.shalabh.svt.lambda.model.ServerlessInput;
 import us.shalabh.svt.lambda.model.ServerlessOutput;
 import us.shalabh.svt.utils.http.HttpUtils;
+import us.shalabh.svt.utils.security.SecurityUtils;
 
 /**
  * Validates JWT Token and Obtains User Info from Auth0
@@ -26,7 +27,7 @@ import us.shalabh.svt.utils.http.HttpUtils;
  * @author Shalabh Jaiswal
  */
 public class UserProfile implements RequestHandler<ServerlessInput, ServerlessOutput>
-{
+{	
 	// Context made global to the class
 	private Context context = null;
 
@@ -75,7 +76,7 @@ public class UserProfile implements RequestHandler<ServerlessInput, ServerlessOu
 		try
 		{
 			// auth0 secret set as env variable in the lambda settings.
-			String secret = System.getenv().get(HttpUtils.AUTH0_SECRET);
+			String secret = System.getenv().get(SecurityUtils.AUTH0_SECRET);
 
 			Algorithm algorithm = Algorithm.HMAC256(secret);
 
@@ -120,7 +121,7 @@ public class UserProfile implements RequestHandler<ServerlessInput, ServerlessOu
 	private String getUserInfo(String authToken)
 	{
 		// auth0 domain
-		String domain = System.getenv().get(HttpUtils.AUTH0_DOMAIN);
+		String domain = System.getenv().get(SecurityUtils.AUTH0_DOMAIN);
 
 		try
 		{

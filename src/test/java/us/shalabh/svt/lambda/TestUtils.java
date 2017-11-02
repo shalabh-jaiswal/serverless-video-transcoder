@@ -34,7 +34,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 /**
  * Helper utilities for testing Lambda functions.
  */
-@SuppressWarnings("deprecation")
 public class TestUtils {
 
     private static final ObjectMapper mapper = new ObjectMapper();
