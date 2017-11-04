@@ -59,18 +59,26 @@ public class VideoList implements RequestHandler<ServerlessInput, ServerlessOutp
 	public ServerlessOutput handleRequest(ServerlessInput input, Context context)
 	{
 		logger.info("Input: " + input);
-
-		// get s3 object then convert to json
-		List<SimpleS3Object> s3Objects = getVideoListFromBucket();
-		String s3ObjectsJSON = toJSON(s3Objects);
-		
-		logger.info("S3 Objects: " + s3ObjectsJSON);
-
-		// response
 		ServerlessOutput output = new ServerlessOutput();
-		HttpUtils.setCORSHeaders(output);		
-		output.setBody(s3ObjectsJSON);
-		
+
+		try
+		{
+			// get s3 object then convert to json
+			List<SimpleS3Object> s3Objects = getVideoListFromBucket();
+			String s3ObjectsJSON = toJSON(s3Objects);
+
+			logger.info("S3 Objects: " + s3ObjectsJSON);
+
+			// response
+			HttpUtils.setCORSHeaders(output);
+			output.setBody(s3ObjectsJSON);
+		}
+		catch (Exception e)
+		{
+			// set error response
+			HttpUtils.setInternalServerErrorResponse(output);
+		}
+
 		return output;
 	}
 
@@ -88,7 +96,7 @@ public class VideoList implements RequestHandler<ServerlessInput, ServerlessOutp
 		List<SimpleS3Object> objects = new ArrayList<>();
 		SimpleS3Object simpleS3Object;
 
-		// lol a do while !!!
+		// haven't written a do while in a while :) !!!
 		do
 		{
 			objectListing = s3.listObjects(bucket);
@@ -99,7 +107,7 @@ public class VideoList implements RequestHandler<ServerlessInput, ServerlessOutp
 				simpleS3Object = new SimpleS3Object();
 				String key = s3ObjectSummary.getKey();
 
-				// we only want the videos not their meta-data files. 
+				// we only want the videos not their meta-data files.
 				if (key != null && key.endsWith(".mp4"))
 				{
 					simpleS3Object.setKey(key);
@@ -113,7 +121,7 @@ public class VideoList implements RequestHandler<ServerlessInput, ServerlessOutp
 
 		return objects;
 	}
-	
+
 	/**
 	 * Convert S3Object list to JSON
 	 * 
@@ -123,11 +131,11 @@ public class VideoList implements RequestHandler<ServerlessInput, ServerlessOutp
 	private String toJSON(List<SimpleS3Object> s3Objects)
 	{
 		ObjectMapper mapper = new ObjectMapper();
-		
-		//Set pretty printing of json
-    	mapper.enable(SerializationFeature.INDENT_OUTPUT);
-    	
-    	try
+
+		// Set pretty printing of json
+		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+		try
 		{
 			return mapper.writeValueAsString(s3Objects);
 		}

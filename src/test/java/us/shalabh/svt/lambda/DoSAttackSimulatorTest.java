@@ -14,7 +14,7 @@ import us.shalabh.svt.lambda.model.ServerlessOutput;
 /**
  * A simple test harness for locally invoking your Lambda function handler.
  */
-public class LoggingWithLog4j2Test {
+public class DoSAttackSimulatorTest {
 
     private static ServerlessInput input;
 
@@ -34,13 +34,13 @@ public class LoggingWithLog4j2Test {
     }
 
     @Test
-    public void testLoggingWithLog4j2() {
-        LoggingWithLog4j2 handler = new LoggingWithLog4j2();
+    public void testDoSAttackSimulator() {
+        DoSAttackSimulator handler = new DoSAttackSimulator();
         Context ctx = createContext();
 
         ServerlessOutput output = handler.handleRequest(input, ctx);
 
         // TODO: validate output here if needed.
-        Assert.assertEquals("Success", output);
+        Assert.assertEquals("Hello from Lambda!", output);
     }
 }

@@ -15,10 +15,12 @@ public class HttpUtils
 {
 	// auth token header name
 	private static final String HEADER_AUTHORIZATION = "Authorization";
-	// access denied
-	private static final int HTTP_ACCESS_DENIED = 401;
 	// token prefix
 	private static final String TOKEN_PREFIX = "Bearer ";
+	
+	// HTTP Status Codes
+	private static final int HTTP_ACCESS_DENIED = 401;
+	private static final int HTTP_INTERNAL_SERVER_ERROR = 500;
 	
 	/**
 	 * Sets CORS headers
@@ -81,5 +83,16 @@ public class HttpUtils
 		output.setBody("Access Denied");
 	}
 	
-	
+	/**
+	 * sets an error response with 500 code
+	 * 
+	 * @param output
+	 */
+	public static void setInternalServerErrorResponse(ServerlessOutput output)
+	{
+		output.setStatusCode(HTTP_INTERNAL_SERVER_ERROR);
+		setCORSHeaders(output);
+		
+		output.setBody("Internal Server Error");
+	}	
 }
