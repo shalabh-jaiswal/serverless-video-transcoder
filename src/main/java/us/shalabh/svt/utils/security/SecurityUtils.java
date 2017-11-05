@@ -17,6 +17,13 @@ public class SecurityUtils
 	public static final String AUTH0_CLIENT_ID = "AUTH0_CLIENT_ID";
 	public static final String AUTH0_SECRET = "AUTH0_SECRET";
 
+	// aws env variables
+	public static final String AWS_ACCESS_KEY = "ACCESS_KEY";
+	public static final String AWS_SECRET_ACCESS_KEY = "SECRET_ACCESS_KEY";
+
+	// encryption algorithim
+	public static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
+	
 	/**
 	 * Decodes a JWT token
 	 * 

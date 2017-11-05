@@ -54,7 +54,7 @@ public class DoSAttackSimulator implements RequestHandler<ServerlessInput, Serve
 	 */
 	private void attemptAttack()
 	{
-		// endpoint
+		// endpoint. get it form the env variables instead of the input
 		String endpoint = System.getenv().get(ENV_KEY_ENDPOINT);
 
 		ExecutorService taskExecutor = Executors.newFixedThreadPool(20);
