@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.amazonaws.services.elastictranscoder.AmazonElasticTranscoder;
-import com.amazonaws.services.elastictranscoder.AmazonElasticTranscoderClient;
+import com.amazonaws.services.elastictranscoder.AmazonElasticTranscoderClientBuilder;
 import com.amazonaws.services.elastictranscoder.model.CreateJobOutput;
 import com.amazonaws.services.elastictranscoder.model.CreateJobRequest;
 import com.amazonaws.services.elastictranscoder.model.JobInput;
@@ -28,10 +28,12 @@ public class TranscodeSubmitHandler implements RequestHandler<S3Event, String>
 	// will attempt to get your credentials in the following order:
 	// 1. Environment variables (AWS_ACCESS_KEY and AWS_SECRET_KEY).
 	// 2. Java system properties (AwsCredentials.properties).
-	// 3. Instance profile credentials on EC2 instances.
-	@SuppressWarnings("deprecation")
-	private AmazonElasticTranscoder amazonElasticTranscoder = new AmazonElasticTranscoderClient();
+	// 3. Instance profile credentials on EC2 instances.	
+	private AmazonElasticTranscoder amazonElasticTranscoder = AmazonElasticTranscoderClientBuilder.standard().build();
 
+	/**
+	 * default constructor
+	 */
 	public TranscodeSubmitHandler()
 	{
 	}
@@ -45,7 +47,7 @@ public class TranscodeSubmitHandler implements RequestHandler<S3Event, String>
 
 	// This is the ID of the Elastic Transcoder pipeline that was created when
 	// setting up your AWS environment
-	private static final String PIPELINE_ID = "1508617281861-pua5m2";
+	private static final String ENV_KEY_PIPELINE_ID = "PIPELINE_ID";
 
 	// Presets that will be used to create the videos
 	private static final String VID_1080p = "1351620000001-000001";
@@ -92,7 +94,8 @@ public class TranscodeSubmitHandler implements RequestHandler<S3Event, String>
 			List<CreateJobOutput> outputs = Arrays.asList(vid_1080p, vid_720p, vid_web_720p);
 
 			// Create the job request and the job.
-			CreateJobRequest createJobRequest = new CreateJobRequest().withPipelineId(PIPELINE_ID).withInput(input)
+			String pipelineID = System.getenv().get(ENV_KEY_PIPELINE_ID);
+			CreateJobRequest createJobRequest = new CreateJobRequest().withPipelineId(pipelineID).withInput(input)
 					.withOutputKeyPrefix(outputKey + "/").withOutputs(outputs);
 
 			amazonElasticTranscoder.createJob(createJobRequest).getJob();
