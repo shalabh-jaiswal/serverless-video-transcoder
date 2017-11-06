@@ -30,7 +30,7 @@ import us.shalabh.svt.utils.http.HttpUtils;
 import us.shalabh.svt.utils.security.SecurityUtils;
 
 /**
- * Gets the encoded and signed upload post policy for UI to post to S3
+ * Gets the encoded and signed upload post policy for UI to upload to S3
  *
  * @author Shalabh Jaiswal
  */
@@ -152,7 +152,7 @@ public class GetUploadPolicy implements RequestHandler<ServerlessInput, Serverle
 	private String getPolicySignature(String encodedPostPolicy)
 			throws NoSuchAlgorithmException, UnsupportedEncodingException, InvalidKeyException
 	{
-		// Secret key
+		// AWS Secret key
 		String secretAccessKey = System.getenv().get(SecurityUtils.AWS_SECRET_ACCESS_KEY);
 		
 		// setup HMAC
@@ -164,7 +164,7 @@ public class GetUploadPolicy implements RequestHandler<ServerlessInput, Serverle
 		// encrypt
 		byte[] rawHmac = shaHMac.doFinal(encodedPostPolicy.getBytes("UTF-8"));
 
-		// encode encrypted signature
+		// encode encrypted signature to base64
 		String signature = new String(Base64.getEncoder().encodeToString(rawHmac));
 
 		return signature;
