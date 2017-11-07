@@ -1,7 +1,5 @@
 package us.shalabh.svt.lambda;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -21,13 +19,10 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.google.api.core.ApiFuture;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import us.shalabh.svt.lambda.model.VideoTranscodingStatus;
+import us.shalabh.svt.utils.db.FirebaseUtils;
 
 /**
  * Includes functionality for Firebase connectivity
@@ -49,9 +44,6 @@ public class TranscodeSubmitWithFirebaseHandler implements RequestHandler<S3Even
 	// 3. Instance profile credentials on EC2 instances.
 	private AmazonElasticTranscoder amazonElasticTranscoder = AmazonElasticTranscoderClientBuilder.standard().build();
 
-	// firebase database reference
-	private static DatabaseReference database;
-
 	/**
 	 * default constructor
 	 */
@@ -69,10 +61,6 @@ public class TranscodeSubmitWithFirebaseHandler implements RequestHandler<S3Even
 	// This is the ID of the Elastic Transcoder pipeline that was created when
 	// setting up your AWS environment
 	private static final String ENV_KEY_PIPELINE_ID = "PIPELINE_ID";
-
-	// env variables related to firebase db
-	private static final String ENV_KEY_SERVICE_ACCOUNT = "SERVICE_ACCOUNT";
-	private static final String ENV_KEY_DATABASE_URL = "DATABASE_URL";
 
 	// Presets that will be used to create the videos
 	private static final String VID_WEB_720p = "1351620000001-100070";
@@ -148,38 +136,16 @@ public class TranscodeSubmitWithFirebaseHandler implements RequestHandler<S3Even
 	 */
 	private void pushVideoEntryToFirebase(String key) throws InterruptedException, ExecutionException 
 	{
-		logger.info("inserting video entry into firebase for key: " + key);
+		// uuid of the key
+		String uuid = key.split("_")[0];
+		
+		logger.info("inserting video entry into firebase for key uuid: " + uuid);
 
-		initDB();
+		DatabaseReference database = FirebaseUtils.getDatabaseReference();
 		
 		// insert into firebase
-		ApiFuture<Void> result = database.child("videos").child(key).setValueAsync(new VideoTranscodingStatus(true));
+		ApiFuture<Void> result = database.child("videos").child(uuid).setValueAsync(new VideoTranscodingStatus(true));
 		// wait for it to execute
 		result.get();			
-	}
-
-	/**
-	 * initializes Firebase DB
-	 */
-	private void initDB()
-	{
-		// Initialize Firebase
-		try (InputStream serviceAccount = TranscodeSubmitWithFirebaseHandler.class
-				.getResourceAsStream("/" + System.getenv().get(ENV_KEY_SERVICE_ACCOUNT));)
-		{
-			FirebaseOptions options = new FirebaseOptions.Builder()
-					.setCredentials(GoogleCredentials.fromStream(serviceAccount))
-					.setDatabaseUrl(System.getenv().get(ENV_KEY_DATABASE_URL)).build();
-			FirebaseApp.initializeApp(options);
-		}
-		catch (IOException e)
-		{
-			// swallow for now
-			logger.error("ERROR: invalid service account credentials.", e);
-		}
-
-		// Shared Database reference
-		database = FirebaseDatabase.getInstance().getReference();
-
 	}
 }

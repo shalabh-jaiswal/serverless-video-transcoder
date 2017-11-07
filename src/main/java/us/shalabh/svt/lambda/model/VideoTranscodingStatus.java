@@ -22,6 +22,12 @@ public class VideoTranscodingStatus
 	// is video still transcoding
 	private boolean transcoding;
 	
+	// key
+	private String key;
+	
+	// bucket
+	private String bucket;
+	
 	/**
 	 * @param transcoding
 	 */
@@ -29,6 +35,19 @@ public class VideoTranscodingStatus
 	{
 		super();
 		this.transcoding = transcoding;
+	}
+	
+	/**
+	 * @param transcoding
+	 * @param key
+	 * @param bucket
+	 */
+	public VideoTranscodingStatus(boolean transcoding, String key, String bucket)
+	{
+		super();
+		this.transcoding = transcoding;
+		this.key = key;
+		this.bucket = bucket;
 	}
 
 	/**
@@ -47,6 +66,38 @@ public class VideoTranscodingStatus
 		this.transcoding = transcoding;
 	}
 
+	/**
+	 * @return the key
+	 */
+	public String getKey()
+	{
+		return key;
+	}
+
+	/**
+	 * @param key the key to set
+	 */
+	public void setKey(String key)
+	{
+		this.key = key;
+	}
+
+	/**
+	 * @return the bucket
+	 */
+	public String getBucket()
+	{
+		return bucket;
+	}
+
+	/**
+	 * @param bucket the bucket to set
+	 */
+	public void setBucket(String bucket)
+	{
+		this.bucket = bucket;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -56,7 +107,12 @@ public class VideoTranscodingStatus
 		StringBuilder builder = new StringBuilder();
 		builder.append("VideoTranscodingStatus [transcoding=");
 		builder.append(transcoding);
+		builder.append(", key=");
+		builder.append(key);
+		builder.append(", bucket=");
+		builder.append(bucket);
 		builder.append("]");
 		return builder.toString();
 	}
+	
 }
